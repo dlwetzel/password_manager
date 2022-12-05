@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 import random
 import pyperclip
+import json
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
            'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
@@ -30,15 +31,30 @@ def save():
     website = website_input.get()
     email = email_input.get()
     password = password_input.get()
-
+    new_data = {
+        website: {
+            "email": email,
+            "password": password,
+        }
+    }
     if len(website) == 0 or len(email) == 0 or len(password) == 0:
-        messagebox.showerror(message="Invalid entry")
+        messagebox.showerror(title="oops", message="Please make sure you haven't left any fields empty.")
     else:
-        is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered: \nEmail: {email}"
-                                                              f"\nPassword: {password} \nIs it ok to save?")
-        if is_ok:
-            with open("data.txt", mode="a") as file:
-                file.write(f"{website}  |  {email}  |  {password}\n")
+        try:
+            with open("data.json", mode="r") as file:
+                # Reading old data
+                data = json.load(file)
+        except FileNotFoundError:
+            with open("data.json", mode="w") as file:
+                json.dump(new_data, file, indent=4)
+        else:
+            # Updating old data with new data
+            data.update(new_data)
+
+            with open("data.json", "w") as file:
+                # Saving updated data
+                json.dump(data, file, indent=4)
+        finally:
             website_input.delete(0, END)
             password_input.delete(0, END)
             website_input.focus()
