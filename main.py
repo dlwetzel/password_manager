@@ -3,6 +3,7 @@ from tkinter import messagebox
 import random
 import pyperclip
 import json
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
            'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
@@ -60,6 +61,22 @@ def save():
             website_input.focus()
 
 
+# ---------------------------- Password Search ------------------------------- #
+def search_passwords():
+    try:
+        with open("data.json", "r") as file:
+            search_website = website_input.get()
+            passwords = json.load(file)
+            search_email = passwords[search_website]["email"]
+            search_password = passwords[search_website]["password"]
+            messagebox.showinfo(title=f"{search_website}", message=f"Email: {search_email}\n"
+                                                                   f"Password: {search_password}")
+    except KeyError:
+        messagebox.showerror(message="No Website info found")
+    except FileNotFoundError:
+        messagebox.showerror(message="No Data File Found")
+
+
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
 window.title("Password Manager")
@@ -92,5 +109,8 @@ generate_password_button.grid(column=2, row=3, sticky="EW")
 
 add_button = Button(text="Add", width=36, command=save)
 add_button.grid(column=1, row=4, columnspan=2, sticky="EW")
+
+search_button = Button(text="Search", command=search_passwords)
+search_button.grid(column=2, row=1, sticky="EW")
 
 window.mainloop()
